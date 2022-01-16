@@ -3,7 +3,7 @@
     <input
       type="text"
       class="todo-input"
-      placeholder="What needs to be done"
+      placeholder="Enter Your Todo Here then click Enter"
       v-model="newTodo"
       @keyup.enter="addTodo"
     />
@@ -39,24 +39,6 @@
 
     <div class="extra-container">
       <div>
-        <button :class="{ active: filter == 'all' }" @click="filter = 'all'">
-          All
-        </button>
-        <button
-          :class="{ active: filter == 'active' }"
-          @click="filter = 'active'"
-        >
-          Active
-        </button>
-        <button
-          :class="{ active: filter == 'completed' }"
-          @click="filter = 'completed'"
-        >
-          Completed
-        </button>
-      </div>
-
-      <div>
         <transition name="fade">
           <button v-if="showClearCompletedButton" @click="clearCompleted">
             Clear Completed
@@ -78,54 +60,25 @@ export default {
     return {
       newTodo: "",
       idForTodo: 3,
-      filter: "all",
-      todos: [
-        {
-              id: 1,
-              title: "Add a new todo",
-              completed: false,
-              editing: false,
-            },
-            {
-              id: 2,
-              title: "Edit a todo by double clicking on it",
-              completed: false,
-              editing: false,
-            },
-            {
-              id: 3,
-              title: "Remove a todo by clicking the X icon",
-              completed: false,
-              editing: false,
-            },
-            {
-              id: 4,
-              title: "Remove all todos by selecting all",
-              completed: false,
-              editing: false,
-            },
-      ],
     };
   },
   computed: {
     remaining() {
-      return this.todos.filter((todo) => !todo.completed).length;
+      return this.$store.state.todos.filter((todo) => !todo.completed).length;
     },
     anyRemaining() {
       return this.remaining != 0;
     },
     todosFiltered() {
-      if (this.filter == "all") {
-        return this.todos;
-      } else if (this.filter == "active") {
-        return this.todos.filter((todo) => !todo.completed);
-      } else if (this.filter == "completed") {
-        return this.todos.filter((todo) => todo.completed);
-      }
-      return this.todos;
+      if (this.$store.state.filter == "all") {
+        return this.$store.state.todos;
+      } 
+      return this.$store.state.todos;
     },
     showClearCompletedButton() {
-      return this.todos.filter((todo) => todo.completed).length > 0;
+      return (
+        this.$store.state.todos.filter((todo) => todo.completed).length > 0
+      );
     },
   },
   methods: {
@@ -133,7 +86,7 @@ export default {
       if (this.newTodo.trim().length == 0) {
         return;
       }
-      this.todos.push({
+      this.$store.state.todos.push({
         id: this.idForTodo,
         title: this.newTodo,
         completed: false,
@@ -142,18 +95,24 @@ export default {
       this.idForTodo++;
     },
     removeTodo(id) {
-      const index = this.todos.findIndex((item) => item.id == id);
-      this.todos.splice(index, 1);
+      const index = this.$store.state.todos.findIndex((item) => item.id == id);
+      this.$store.state.todos.splice(index, 1);
     },
     checkAllTodos() {
-      this.todos.forEach((todo) => (todo.completed = event.target.checked));
+      this.$store.state.todos.forEach(
+        (todo) => (todo.completed = event.target.checked)
+      );
     },
     clearCompleted() {
-      this.todos = this.todos.filter((todo) => !todo.completed);
+      this.$store.state.todos = this.$store.state.todos.filter(
+        (todo) => !todo.completed
+      );
     },
     finishedEdit(data) {
-      const index = this.todos.findIndex((item) => item.id == data.id);
-      this.todos.splice(index, 1, data);
+      const index = this.$store.state.todos.findIndex(
+        (item) => item.id == data.id
+      );
+      this.$store.state.todos.splice(index, 1, data);
     },
   },
 };
@@ -214,16 +173,5 @@ button {
   background-color: white;
   appearance: none;
 }
-.active {
-  background: lightgreen;
-}
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>
