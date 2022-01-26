@@ -86,7 +86,7 @@ export default {
       if (this.newTodo.trim().length == 0) {
         return;
       }
-      this.$store.state.todos.push({
+      this.$store.state.todos.unshift({
         id: this.idForTodo,
         title: this.newTodo,
         completed: false,
